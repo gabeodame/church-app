@@ -8,6 +8,9 @@ import { AttendanceModule } from './attendance/attendance.module';
 import { GivingModule } from './giving/giving.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
+import { PostController } from './post/post.controller';
+import { PostService } from './post/post.service';
+import { PostModule } from './post/post.module';
 
 @Module({
   imports: [
@@ -21,6 +24,9 @@ import { ConfigModule } from '@nestjs/config';
     AttendanceModule,
     GivingModule,
     PrismaModule,
+    PostModule,
   ],
+  controllers: [PostController],
+  providers: [PostService],
 })
 export class AppModule {}

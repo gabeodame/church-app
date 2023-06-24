@@ -19,8 +19,11 @@ model User {
   password    String
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  role        Role         @default(USER)
   posts       Post[]
   departments Department[]
+  groups      Group[]
+  profileViews Int @default(0)
 
   @@map("users")
 }
@@ -29,10 +32,15 @@ model Post {
   id        Int      @id @default(autoincrement())
   title     String
   content   String
+  published Boolean  @default(false)
+  comements Json?
+  views     Int?     @default(0)
+  likes     Int?     @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   author    User     @relation(fields: [authorId], references: [id])
   authorId  Int
+
 
   @@map("posts")
 }
@@ -46,4 +54,25 @@ model Department {
   members   User[]
 
   @@map("departments")
+}
+
+model Group {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members   User[]
+
+  @@map("groups")
+}
+
+
+
+enum Role {
+  ADMIN
+  USER
+  GUEST
+  AUTHOR
+  EDITOR
 }
