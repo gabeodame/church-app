@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthSignInDto, AuthSignUpDto } from './dto';
+import { User } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -16,7 +17,8 @@ export class AuthController {
   // User sign up
   @Post('signup')
   signUp(@Body() dto: AuthSignUpDto) {
-    // console.log({ dto });
+    console.log({ dto });
+    // return { message: 'User created' };
     return this.AuthService.signUp(dto);
   }
   // User sign in

@@ -11,38 +11,56 @@ datasource db {
 }
 
 model User {
-  id          Int          @id @default(autoincrement())
-  email       String       @unique
-  username    String       @unique
-  firstName   String?
-  lastName    String?
-  password    String
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  role        Role         @default(USER)
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  username     String    @unique
+  firstName    String?
+  lastName     String?
+  bio          String?
+  gender       String?
+  dob          DateTime? @map("date_of_birth") @db.Date
+  password     String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  role         Role      @default(USER)
+  profileViews Int       @default(0)
+
   posts       Post[]
   departments Department[]
   groups      Group[]
-  profileViews Int @default(0)
+  // participants Participant[]
 
   @@map("users")
 }
 
 model Post {
-  id        Int      @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   title     String
   content   String
-  published Boolean  @default(false)
-  comements Json?
-  views     Int?     @default(0)
-  likes     Int?     @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  author    User     @relation(fields: [authorId], references: [id])
+  summary   String
+  published PostStatus @default(DRAFT)
+  comments  Json?
+  views     Int?       @default(0)
+  likes     Int?       @default(0)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  author    User       @relation(fields: [authorId], references: [id])
   authorId  Int
 
+  tags Tags[]
 
   @@map("posts")
+}
+
+model Tags {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  posts     Post[]
+  postIds   Int[]    @map("post_ids")
+
+  @@map("tags")
 }
 
 model Department {
@@ -50,24 +68,25 @@ model Department {
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
- 
-  members   User[]
+
+  members User[]
 
   @@map("departments")
 }
 
 model Group {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  members   User[]
+  members User[]
+
+  // participants Participant[]
 
   @@map("groups")
 }
-
-
 
 enum Role {
   ADMIN
@@ -75,4 +94,41 @@ enum Role {
   GUEST
   AUTHOR
   EDITOR
+}
+
+enum Status {
+  ACTIVE // active participants
+  INACTIVE // inactive participants
+  SUSPENDED // suspended participants 
+  DELETED // deleted participants
+}
+
+// model Participant {
+//   id        Int      @id @default(autoincrement())
+//   status    Status   @default(ACTIVE)
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   user   User @relation(fields: [userId], references: [id])
+//   userId Int
+
+//   // group   Group @relation(fields: [groupId], references: [id])
+//   groupId Int
+
+//   @@map("participants")
+// }
+
+model Service {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("services")
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }

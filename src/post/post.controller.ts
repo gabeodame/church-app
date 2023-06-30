@@ -9,9 +9,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { PostService } from './post.service';
-import { PostDto } from './dto';
-import { Post as post } from '@prisma/client';
+import { PostDto, PostFilterDto, UpdatePostDto } from './dto';
+import { User, Post as post } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guard';
+import { GetUser } from 'src/auth/decorator';
 
 @Controller('posts')
 export class PostController {
@@ -19,31 +20,33 @@ export class PostController {
 
   // TODO: Add CRUD operations for posts
 
-  @Get('')
-  getPosts() {
-    return this.postService.getPosts();
+  @Get()
+  getPosts(@Body() filterDto: PostFilterDto): Promise<post[]> {
+    return this.postService.getPosts(filterDto);
   }
 
   @UseGuards(JwtGuard)
-  @Post('new')
-  createPost(@Body() dto: any) {
-    console.log({ dto });
-    return this.postService.createPost(dto);
+  @Post()
+  createPost(@Body() dto: PostDto, @GetUser() user: User): Promise<post> {
+    const data = { dto, user };
+    return this.postService.createPost(data);
   }
 
-  @Get(':id')
-  getPost(@Param() id: number) {
-    console.log({ id });
-    return this.postService.getPost(id);
+  @Get('/:id')
+  getPost(@Param('id') id: number): Promise<post> {
+    const postId = Number(id);
+    return this.postService.getPost(postId);
   }
 
-  @Patch(':id')
-  updatePost(@Param() id: number, data: post) {
-    return this.postService.updatePost(id, data);
+  @Patch('/:id')
+  updatePost(@Param('id') id: number, @Body() data: post): Promise<post> {
+    const postId = Number(id);
+    return this.postService.updatePost(postId, data);
   }
 
-  @Delete(':id')
-  deletePost(@Param() id: number) {
-    return this.postService.deletePost(id);
+  @Delete('/:id')
+  deletePost(@Param('id') id: number) {
+    const postId = Number(id);
+    return this.postService.deletePost(postId);
   }
 }
